@@ -1,66 +1,62 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { getSession } from '@/lib/session';
+import db from '@/lib/db';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
-export default function Home() {
+export default async function Dashboard() {
+  const session = await getSession();
+  if (!session.user) {
+    redirect('/login');
+  }
+
+  const userId = session.user.id;
+  const pitches = db.prepare('SELECT * FROM pitches WHERE user_id = ? ORDER BY updated_at DESC').all(userId);
+
+  const totalPitches = pitches.length;
+  const todayActivity = pitches.filter(p => {
+    const today = new Date().toDateString();
+    return new Date(p.updated_at).toDateString() === today || new Date(p.created_at).toDateString() === today;
+  }).length;
+  
+  const recentPitches = pitches.slice(0, 3);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h2>Welcome back, {session.user.username}!</h2>
+        <Link href="/pitches/new" className="button">Quick Create Pitch</Link>
+      </div>
+
+      <div className="dashboard-stats">
+        <div className="stat-box">
+          <p>Total Pitches</p>
+          <h2>{totalPitches}</h2>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="stat-box">
+          <p>Recent Pitches</p>
+          <h2>{recentPitches.length}</h2>
         </div>
-      </main>
+        <div className="stat-box">
+          <p>Today's Activity</p>
+          <h2>{todayActivity}</h2>
+        </div>
+      </div>
+
+      <h3>Recent Pitches</h3>
+      {recentPitches.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <p className="muted">No pitches yet. Start polishing your first pitch!</p>
+        </div>
+      ) : (
+        <div className="grid" style={{ marginTop: '1rem' }}>
+          {recentPitches.map(pitch => (
+            <Link href={`/pitches/${pitch.id}`} key={pitch.id} className="card pitch-card">
+              <h3>{pitch.title}</h3>
+              <p>{pitch.content}</p>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
