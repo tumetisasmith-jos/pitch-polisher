@@ -16,7 +16,7 @@ export default function PitchEditorClient({ pitch, updateAction, deleteAction })
     setError('');
     
     try {
-      const res = await fetch('/api/ai/polish', {
+      const res = await fetch('/api/polish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, targetAudience, content })
@@ -64,7 +64,7 @@ export default function PitchEditorClient({ pitch, updateAction, deleteAction })
           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
             <button type="submit" style={{ flex: 1 }}>Update Pitch</button>
             <button type="button" onClick={handleAIPolish} className="secondary" style={{ flex: 1, borderColor: 'var(--secondary)', color: 'var(--secondary)' }} disabled={isLoading}>
-              {isLoading ? 'Polishing...' : 'AI Polish ✨'}
+              {isLoading ? 'Polishing...' : 'AI Polish'}
             </button>
           </div>
         </form>
