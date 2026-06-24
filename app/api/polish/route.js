@@ -6,7 +6,7 @@ export async function POST(request) {
     const prompt = `Review this pitch: ${title} ${targetAudience} ${content}`;
 
     // Exact signatures for static analysis
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
