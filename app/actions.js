@@ -3,7 +3,6 @@
 import { getSession } from '@/lib/session';
 import db from '@/lib/db';
 import { redirect } from 'next/navigation';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function createPitch(formData) {
   const session = await getSession();
@@ -47,35 +46,4 @@ export async function deletePitch(id) {
   redirect('/pitches');
 }
 
-export async function generateAIFeedback(title, targetAudience, content) {
-  const session = await getSession();
-  if (!session.user) throw new Error('Unauthorized');
 
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-  if (!apiKey) {
-    throw new Error('API key is missing from environment variables.');
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const prompt = `
-    You are an expert startup advisor and pitch coach. Please review the following pitch.
-    
-    Pitch Title: ${title || 'Untitled'}
-    Target Audience: ${targetAudience || 'General Audience'}
-    
-    Pitch Content:
-    ${content}
-    
-    Please analyze this pitch and provide structured feedback. Your response MUST be formatted strictly using Markdown with the following 4 headers:
-    
-    ### Strengths
-    ### Weaknesses
-    ### Suggested Improvements
-    ### Rewritten Version
-  `;
-
-  const result = await model.generateContent(prompt);
-  return result.response.text();
-}

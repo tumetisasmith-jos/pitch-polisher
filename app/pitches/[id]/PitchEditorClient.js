@@ -2,8 +2,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { generateAIFeedback } from '@/app/actions';
-
 export default function PitchEditorClient({ pitch, updateAction, deleteAction }) {
   const [title, setTitle] = useState(pitch.title);
   const [targetAudience, setTargetAudience] = useState(pitch.target_audience || '');
@@ -18,8 +16,19 @@ export default function PitchEditorClient({ pitch, updateAction, deleteAction })
     setError('');
     
     try {
-      const feedback = await generateAIFeedback(title, targetAudience, content);
-      setAiFeedback(feedback);
+      const res = await fetch('/api/ai/polish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, targetAudience, content })
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to fetch AI feedback');
+      }
+      
+      setAiFeedback(data.text);
     } catch (err) {
       setError(err.message);
     } finally {
