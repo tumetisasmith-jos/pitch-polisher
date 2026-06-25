@@ -12,7 +12,7 @@ export default async function RootLayout({ children }) {
   
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning>
         {/* Animated background elements */}
         <div className="bg-grid"></div>
         <div className="bg-orb bg-orb-1"></div>
