@@ -28,7 +28,8 @@ export default function PitchEditorClient({ pitch, updateAction, deleteAction })
         throw new Error(data.error || 'Failed to fetch AI feedback');
       }
       
-      setAiFeedback(data.text);
+      const parsedFeedback = JSON.parse(data.text);
+      setAiFeedback(parsedFeedback);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -90,9 +91,57 @@ export default function PitchEditorClient({ pitch, updateAction, deleteAction })
             </div>
           )}
           
-          {aiFeedback && !isLoading && !error && (
-            <div className="markdown-body" style={{ fontSize: '0.95rem', lineHeight: '1.6' }}>
-              <ReactMarkdown>{aiFeedback}</ReactMarkdown>
+          {aiFeedback && typeof aiFeedback === 'object' && !isLoading && !error && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              
+              <div className="feedback-section strengths">
+                <h3 style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.2rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>💪</span> Strengths
+                </h3>
+                <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {aiFeedback.strengths?.map((item, i) => (
+                    <li key={i} style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', borderLeft: '4px solid #10b981', color: 'var(--foreground)' }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="feedback-section weaknesses">
+                <h3 style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.2rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>🎯</span> Areas for Improvement
+                </h3>
+                <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {aiFeedback.weaknesses?.map((item, i) => (
+                    <li key={i} style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', borderLeft: '4px solid #ef4444', color: 'var(--foreground)' }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="feedback-section actionable">
+                <h3 style={{ color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.2rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>💡</span> Suggested Tweaks
+                </h3>
+                <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {aiFeedback.improvements?.map((item, i) => (
+                    <li key={i} style={{ padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', borderLeft: '4px solid #3b82f6', color: 'var(--foreground)' }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="feedback-section rewritten">
+                <h3 style={{ color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.2rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>✨</span> AI Rewritten Pitch
+                </h3>
+                <div style={{ padding: '1.5rem', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '8px', border: '1px solid rgba(168, 85, 247, 0.3)', color: 'var(--foreground)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
+                  {aiFeedback.rewritten}
+                </div>
+              </div>
+
             </div>
           )}
         </div>
