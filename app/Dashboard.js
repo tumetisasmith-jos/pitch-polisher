@@ -98,7 +98,7 @@ export default async function Dashboard({ user }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Recent Pitches</h3>
         {totalPitches > 0 && (
-          <Link href="/pitches" className="muted" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 500 }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--text-bright)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--muted)'}>
+          <Link href="/pitches" className="muted" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 500 }}>
             View All
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </Link>
